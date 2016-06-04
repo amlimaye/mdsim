@@ -17,12 +17,16 @@ int main(int argc, char** argv) {
 	double rcut = 2.5;
 
 	//define number of steps
-	unsigned int nsteps = 1000000;
+	unsigned int nsteps = 20000;
 	float dt = 0.01;
 
-	//define writing and thermostatting intervals
-	unsigned int thermostat_interval = 1;
+	//define writing interval
 	unsigned int write_interval = 1000;
+
+	//define rescaling thermostat parameters
+	unsigned int thermostat_interval = 1000;
+	unsigned int thermostat_stop_step = 10000;
+	double target_temp = 0.5;
 
 	//seed random number generator
 	unsigned int randseed = (unsigned int) time(NULL);
@@ -46,9 +50,10 @@ int main(int argc, char** argv) {
 	double* v;
 	double* F;
 
-	//declare and initialize U,T variables
+	//declare and initialize U,T,Teff variables
 	double U = 0.0;
 	double T = 0.0;
+	double Teff = 0.0;
 
 	//initialize position, velocity, and forces arrays
 	r = initializeVectorArray(N,0.0);
@@ -71,13 +76,21 @@ int main(int argc, char** argv) {
 	for (int step = 0; step < nsteps; step++) {
 		advanceVelocityVerletTimestep(N,L,rcut,dt,r,v,potfunc,F,&U);
 
-		//compute KE every time we need to write or thermostat
-		if ((step % write_interval == 0) || (step % thermostat_interval == 0)) {
-			T = computeKE(N,v);
+		//thermostat every thermostat interval
+		if ((step % thermostat_interval == 0)  && (step < thermostat_stop_step)) {
+			Teff = rescaleVelocities(N,v,target_temp);
+
+			//write message to log file
+			char buffer[81];
+			sprintf(buffer,"Rescaled velocities at step: %12d, previous Teff: %12.8f",step,Teff);
+			writeLogEntry(log_fp,buffer);
 		}
 
 		//write to log and results file every writing interval
 		if (step % write_interval == 0) {
+			//compute kinetic energy for writing
+			T = computeKE(N,v);
+
 			//write to results file
 			writeTimestep(results_fp,step,dt,U,T);
 
