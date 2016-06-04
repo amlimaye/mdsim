@@ -70,6 +70,9 @@ void finalizeLogFile(FILE* a_fp) {
 
 	//write a final message into log file
 	fprintf(a_fp,"Simulation completed at: %s\n",time_buffer);
+	
+	//close file pointer
+	fclose(a_fp);
 }
 
 void finalizeResultsFile(FILE* a_fp) {
