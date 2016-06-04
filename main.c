@@ -6,31 +6,34 @@
 #include "thermostat.h"
 
 int main(int argc, char** argv) {
+	//declare simulation inputs struct
+	inputs_t inputs;
+
 	//define box length
-	double L = 7;
+	inputs.L = 7;
 	
 	//define number of particles on a side
 	unsigned int nSide = 5;
-	unsigned int N = nSide*nSide;
+	inputs.N = nSide*nSide;
 
 	//define LJ cutoff distance
-	double rcut = 2.5;
+	inputs.rcut = 2.5;
 
 	//define number of steps
-	unsigned int nsteps = 20000;
-	float dt = 0.01;
+	inputs.nsteps = 20000;
+	inputs.dt = 0.01;
 
 	//define writing interval
-	unsigned int write_interval = 1000;
+	inputs.write_interval = 1000;
 
 	//define rescaling thermostat parameters
-	unsigned int thermostat_interval = 1000;
-	unsigned int thermostat_stop_step = 10000;
-	double target_temp = 0.5;
+	inputs.therm_interval = 1000;
+	inputs.thermostat_stop_step = 10000;
+	inputs.target_temp = 0.5;
 
 	//seed random number generator
-	unsigned int randseed = (unsigned int) time(NULL);
-	srand(randseed);
+	inputs.randseed = (unsigned int) time(NULL);
+	srand(inputs.randseed);
 
 	//choose the potential function we want (LJ in this case)
 	potfunc_t potfunc = &lj_6_12;
@@ -40,10 +43,10 @@ int main(int argc, char** argv) {
 	FILE* results_fp = initializeResultsFile("results.txt");
 
 	//write log entries with simulation parameters
-	writeFirstLogEntry(log_fp,L,N,rcut,nsteps,dt,randseed,thermostat_interval,write_interval);
+	writeFirstLogEntry(log_fp,inputs);
 
 	//calculate particle spacing
-	double spacing = (double) L/nSide;
+	double spacing = (double) inputs.L/nSide;
 
 	//declare postion, velocity, and forces arrays
 	double* r;
@@ -56,29 +59,29 @@ int main(int argc, char** argv) {
 	double Teff = 0.0;
 
 	//initialize position, velocity, and forces arrays
-	r = initializeVectorArray(N,0.0);
-	v = initializeVectorArray(N,0.0);
-	F = initializeVectorArray(N,0.0);
+	r = initializeVectorArray(inputs.N,0.0);
+	v = initializeVectorArray(inputs.N,0.0);
+	F = initializeVectorArray(inputs.N,0.0);
 
 	//place particles on a square lattice
 	placeOnSquareLattice(nSide,spacing,r);
 
 	//initialize velocities
-	drawRandomVelocities(N,v);
+	drawRandomVelocities(inputs.N,v);
 
 	//remove COM velocity
-	removeCOMVelocity(N,v);
+	removeCOMVelocity(inputs.N,v);
 
 	//do first pair computation
-	doPairComputation(N,L,rcut,r,potfunc,F,&U);
+	doPairComputation(inputs.N,inputs.L,inputs.rcut,r,potfunc,F,&U);
 
 	//main loop through Verlet integrator timesteps
-	for (int step = 0; step < nsteps; step++) {
-		advanceVelocityVerletTimestep(N,L,rcut,dt,r,v,potfunc,F,&U);
+	for (int step = 0; step < inputs.nsteps; step++) {
+		advanceVelocityVerletTimestep(inputs.N,inputs.L,inputs.rcut,inputs.dt,r,v,potfunc,F,&U);
 
 		//thermostat every thermostat interval
-		if ((step % thermostat_interval == 0)  && (step < thermostat_stop_step)) {
-			Teff = rescaleVelocities(N,v,target_temp);
+		if ((step % inputs.therm_interval == 0) && (step < inputs.thermostat_stop_step)) {
+			Teff = rescaleVelocities(inputs.N,v,inputs.target_temp);
 
 			//write message to log file
 			char buffer[81];
@@ -87,12 +90,12 @@ int main(int argc, char** argv) {
 		}
 
 		//write to log and results file every writing interval
-		if (step % write_interval == 0) {
+		if (step % inputs.write_interval == 0) {
 			//compute kinetic energy for writing
-			T = computeKE(N,v);
+			T = computeKE(inputs.N,v);
 
 			//write to results file
-			writeTimestep(results_fp,step,dt,U,T);
+			writeTimestep(results_fp,step,inputs.dt,U,T);
 
 			//write to log file
 			char buffer[38];

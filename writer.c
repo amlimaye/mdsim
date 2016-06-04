@@ -29,27 +29,31 @@ FILE* initializeLogFile(char* a_fname) {
 	return fp;
 }
 
-void writeFirstLogEntry(FILE* a_fp, double a_L, unsigned int a_N, double a_rcut, unsigned int a_nsteps, double a_dt, unsigned int a_randseed, double a_therm_interval, double a_write_interval) {
+void writeFirstLogEntry(FILE* a_fp, inputs_t a_inputs) {
 	//define a char buffer to hold results from sprintf
 	char buffer[46];
 
 	//write various log entries
 	writeLogEntry(a_fp,"\nSimulation Parameters:\n");
-	sprintf(buffer,"%30s: %12.8f","Box Length",a_L);
+	sprintf(buffer,"%30s: %12.8f","Box Length",a_inputs.L);
 	writeLogEntry(a_fp,buffer);
-	sprintf(buffer,"%30s: %12u","Number of Particles",a_N);
+	sprintf(buffer,"%30s: %12u","Number of Particles",a_inputs.N);
 	writeLogEntry(a_fp,buffer);
-	sprintf(buffer,"%30s: %12.8f","Lennard-Jones Cutoff Radius",a_rcut);
+	sprintf(buffer,"%30s: %12.8f","Lennard-Jones Cutoff Radius",a_inputs.rcut);
 	writeLogEntry(a_fp,buffer);
-	sprintf(buffer,"%30s: %12u","Number of MD Steps",a_nsteps);
+	sprintf(buffer,"%30s: %12u","Number of MD Steps",a_inputs.nsteps);
 	writeLogEntry(a_fp,buffer);
-	sprintf(buffer,"%30s: %12.8f","Integrator Timestep",a_dt);
+	sprintf(buffer,"%30s: %12.8f","Integrator Timestep",a_inputs.dt);
 	writeLogEntry(a_fp,buffer);
-	sprintf(buffer,"%30s: %12.8f","Thermostat Interval",a_therm_interval);
+	sprintf(buffer,"%30s: %12u","Thermostat Interval",a_inputs.therm_interval);
 	writeLogEntry(a_fp,buffer);
-	sprintf(buffer,"%30s: %12.8f","Writing Interval",a_write_interval);
+	sprintf(buffer,"%30s: %12u","Thermostat Stop Step",a_inputs.thermostat_stop_step);
 	writeLogEntry(a_fp,buffer);
-	sprintf(buffer,"%30s: %12u\n","RNG Seed",a_randseed);
+	sprintf(buffer,"%30s: %12.8f","Target Temperature",a_inputs.target_temp);
+	writeLogEntry(a_fp,buffer);
+	sprintf(buffer,"%30s: %12u","Writing Interval",a_inputs.write_interval);
+	writeLogEntry(a_fp,buffer);
+	sprintf(buffer,"%30s: %12u\n","RNG Seed",a_inputs.randseed);
 	writeLogEntry(a_fp,buffer);
 }
 
