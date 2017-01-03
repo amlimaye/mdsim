@@ -29,6 +29,15 @@ FILE* initializeLogFile(char* a_fname) {
 	return fp;
 }
 
+FILE* initializeTrjFile(char* a_fname) {
+	//open trajectory file (.xyz) for writing
+	FILE* fp;
+	fp = fopen(a_fname,"w");
+
+	//return file pointer
+	return fp;
+}
+
 void writeFirstLogEntry(FILE* a_fp, inputs_t a_inputs) {
 	//define a char buffer to hold results from sprintf
 	char buffer[46];
@@ -64,6 +73,18 @@ void writeLogEntry(FILE* a_fp, char* a_entry) {
 void writeTimestep(FILE* a_fp, int a_step, double a_dt, double a_U, double a_T) {
 	//write log for this timestep into the file
 	fprintf(a_fp,"%12d,%12.8f,%12.8f,%12.8f,%12.8f\n",a_step,a_dt*a_step,a_U,a_T,a_U+a_T);
+}
+
+void writePositions(FILE* a_fp, unsigned int a_N, unsigned int a_frame, double* a_r) {
+	fprintf(a_fp,"%d\n",a_N);
+	fprintf(a_fp,"frame%d\n",a_frame);
+	for (int i = 0; i < a_N; i++) {
+		double ri[DIM];
+		for (int k = 0; k < DIM; k++) {
+			ri[k] = a_r[i*DIM + k];
+		}
+		fprintf(a_fp,"H %12.8f %12.8f %12.8f\n",ri[0],ri[1],ri[2]);
+	}
 }
 
 void finalizeLogFile(FILE* a_fp) {

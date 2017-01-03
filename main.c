@@ -38,9 +38,10 @@ int main(int argc, char** argv) {
 	//choose the potential function we want (LJ in this case)
 	potfunc_t potfunc = &lj_6_12;
 
-	//initialize log file and results file
+	//initialize log file, results file, and trajectory file
 	FILE* log_fp = initializeLogFile("log.txt");
 	FILE* results_fp = initializeResultsFile("results.txt");
+	FILE* traj_fp = initializeTrjFile("traj.xyz");
 
 	//write log entries with simulation parameters
 	writeFirstLogEntry(log_fp,inputs);
@@ -101,6 +102,11 @@ int main(int argc, char** argv) {
 			char buffer[38];
 			sprintf(buffer,"Dumped results at step: %12d",step);
 			writeLogEntry(log_fp,buffer);
+		}
+
+		//write to trajectory file each trajectory interval
+		if (step % inputs.trajectory_interval == 0) {
+			writePositions(traj_fp,inputs.N,step/inputs.trajectory_interval,r);
 		}
 	}
 

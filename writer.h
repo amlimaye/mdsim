@@ -17,13 +17,16 @@ typedef struct {
 	unsigned int thermostat_stop_step;
 	double target_temp;
 	unsigned int write_interval;
+	unsigned int trajectory_interval;
 } inputs_t;
 
 FILE* 	initializeResultsFile(char* a_fname);
 FILE*	initializeLogFile(char* a_fname);
+FILE* 	initializeTrjFile(char* a_fname);
 void	writeFirstLogEntry(FILE* a_fp, inputs_t a_inputs);
 void	writeLogEntry(FILE* a_fp, char* a_entry);
 void 	writeTimestep(FILE* a_fp, int a_step, double a_dt, double a_U, double a_T);
+void	writePositions(FILE* a_fp, unsigned int a_N, unsigned int a_frame, double* a_r);
 void	finalizeLogFile(FILE* a_fp);
 void 	finalizeResultsFile(FILE* a_fp);
 
