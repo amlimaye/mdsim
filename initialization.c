@@ -6,24 +6,27 @@ static inline double myrand() {
 
 void removeCOMVelocity(unsigned int a_N, double* a_velocityPtr) {
 	//compute center of mass velocity
-	double comVelocity[] = {0.0,0.0};
+	double comVelocity[DIM];
 	for (int i = 0; i < a_N; i++) {
-		comVelocity[0] += a_velocityPtr[i*DIM]/a_N;
-		comVelocity[1] += a_velocityPtr[i*DIM+1]/a_N;
+		for (int k = 0; k < DIM; k++) {
+			comVelocity[k] += a_velocityPtr[i*DIM + k]/a_N;
+		}
 	}
 
 	//subtract off COM velocity
 	for (int i =0; i < a_N; i++) {
-		a_velocityPtr[i*DIM] -= comVelocity[0];
-		a_velocityPtr[i*DIM+1] -= comVelocity[1];
+		for (int k = 0; k < DIM; k++){
+			a_velocityPtr[i*DIM + k] -= comVelocity[k];
+		}
 	}
 }
 
 void drawRandomVelocities(unsigned int a_N, double* a_velocityPtr) {
 	for (int i = 0; i < a_N; i++) {
-		//draw velocities from a symmetric random distribution over [-0.5, 0.5)
-		a_velocityPtr[i*DIM] = myrand() - 0.5;
-		a_velocityPtr[i*DIM + 1] = myrand() - 0.5;
+		for (int k = 0; k < DIM; k++) {
+			//draw velocities from a symmetric random distribution over [-0.5, 0.5)
+			a_velocityPtr[i*DIM + k] = myrand() - 0.5;
+		}
 	}
 }
 
@@ -32,20 +35,25 @@ void placeOnSquareLattice(unsigned int a_nSide, double a_spacing, double* a_posi
 	int index = 0;
 	double xPos;
 	double yPos;
+	double zPos;
 
 	//double loop through particles on a side in each dimension
 	for (int i = 0; i < a_nSide; i++) {
 		for (int j = 0; j < a_nSide; j++) {
-			//set x and y positions for this particle
-			xPos = i*a_spacing;
-			yPos = j*a_spacing;
+			for (int k = 0; k < a_nSide; k++) {
+				//set positions for this particle
+				xPos = i*a_spacing;
+				yPos = j*a_spacing;
+				zPos = k*a_spacing;
 
-			//write these positions into positions array
-			a_positionsPtr[index*DIM] = xPos;
-			a_positionsPtr[index*DIM+1] = yPos;
+				//write these positions into positions array
+				a_positionsPtr[index*DIM] = xPos;
+				a_positionsPtr[index*DIM+1] = yPos;
+				a_positionsPtr[index*DIM+2] = zPos;
 
-			//increment index variable
-			index++;
+				//increment index variable
+				index++;	
+			}
 		}
 	}
 }

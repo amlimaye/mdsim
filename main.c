@@ -14,21 +14,24 @@ int main(int argc, char** argv) {
 	
 	//define number of particles on a side
 	unsigned int nSide = 5;
-	inputs.N = nSide*nSide;
+	inputs.N = pow(nSide,DIM);
 
 	//define LJ cutoff distance
-	inputs.rcut = 2.5;
+	inputs.rcut = 5.0;
 
 	//define number of steps
-	inputs.nsteps = 20000;
+	inputs.nsteps = 10000;
 	inputs.dt = 0.01;
 
 	//define writing interval
-	inputs.write_interval = 1000;
+	inputs.write_interval = 10;
+
+	//define trajectory interval
+	inputs.trajectory_interval = 10;
 
 	//define rescaling thermostat parameters
 	inputs.therm_interval = 1000;
-	inputs.thermostat_stop_step = 10000;
+	inputs.thermostat_stop_step = 1;
 	inputs.target_temp = 0.5;
 
 	//seed random number generator

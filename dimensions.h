@@ -1,1 +1,1 @@
-#define DIM 2
+#define DIM 3
